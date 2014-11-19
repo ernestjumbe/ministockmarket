@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 public class Game {
   
   double currentfunds;
@@ -8,8 +6,6 @@ public class Game {
     currentfunds = funds;
   }
   int currentround = 1;
-  double sugarstock = 0;
-  double steelstock = 0;
   double totalstock;
   double storageprice = 3.00;
   
@@ -23,6 +19,8 @@ public class Game {
     String s;
     int amount;
     boolean canplay = true;
+    boolean cansell = false;
+    boolean testsell = true;
     
     while(canplay){
       double roundendstock = 0;
@@ -68,11 +66,21 @@ public class Game {
           s = StdIn.readString();
           if (s.equals("Y")){
             System.out.print("Enter amount to sell in tons. (example 100): ");
-            amount = StdIn.readInt();
-            sellStock(amount, goodArray[i].currentprice);
-            goodArray[i].stock -= amount;
+            //amount = StdIn.readInt();
+            //cansell = checkStock(amount, goodArray[i].stock);
+            while (testsell){
+              amount = StdIn.readInt();
+              cansell = checkStock(amount, goodArray[i].stock);
+              if (cansell) {
+                sellStock(amount, goodArray[i].stock);
+                goodArray[i].stock -= amount;
+                testsell = false;
+              } else {
+                System.out.println("You do not have " + amount + " tons of " + goodArray[i].name + " to sell");
+                System.out.print("Enter amount to sell in tons. (example 100): ");
+              }
+            }
             System.out.println("Funds: $ " + currentfunds);
-            System.out.println("Stock: " + goodArray[i].stock);
           }
         }
       }
@@ -139,6 +147,8 @@ public class Game {
       return false;
     }
   }
+  
+  
   
   private void printFunds(){
     System.out.println("You have $" + currentfunds + " available.");

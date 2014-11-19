@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public class Good {
   String name;
   double currentprice;
@@ -17,9 +15,7 @@ public class Good {
   public double roundPrice(){
     double range = Math.abs(maxprice - minprice);
     currentprice = (Math.random() * range) + (minprice <= maxprice ? minprice : maxprice);
-    //System.out.println("Generated random: " + (double)currentPrice);
     return currentprice;
-     
   }
   
   
