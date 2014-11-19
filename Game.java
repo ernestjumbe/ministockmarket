@@ -1,95 +1,97 @@
 import java.util.Scanner;
 
 public class Game {
-  double currentfunds = 10000;
+  
+  double currentfunds;
+  
+  Game(double funds){
+    currentfunds = funds;
+  }
   int currentround = 1;
   double sugarstock = 0;
   double steelstock = 0;
   double totalstock;
   double storageprice = 3.00;
-  Good sugar = new Good("Sugar", 13.00, 20.00);
-  Good steel = new Good("steel", 21.00, 54.00);
   
-  public static void main(String [] args){
-    //startGame();
-    
-  }
+  Good[] goodArray = new Good[3];
   
   public void run(){
     
-    Scanner sc = new Scanner(System.in);
-    String ans;
+    goodArray[0] = new Good("Sugar", 13.00, 20.00);
+    goodArray[1] = new Good("Steel", 21.00, 54.00);
+    
+    String s;
+    int amount;
     boolean canplay = true;
     
     while(canplay){
+      double roundendstock = 0;
+      addGood(currentfunds);
       System.out.println("Round number: " + currentround);
-      double sugarprice = sugar.roundPrice();
-      double steelprice = steel.roundPrice();
-      System.out.println("You have $" + currentfunds + " available.");
-      System.out.println("You have " + sugarstock + " of sugar " + steelstock + " and of steel.");
-      System.out.println(sugar.name + " price in this round: " + sugarprice);
-      System.out.println(steel.name + " price in this round: " + steelprice);
+      for(int i = 0; i < goodArray.length; i++) {
+        if (goodArray[i] != null) {
+          goodArray[i].roundPrice();
+        }
+      }
+      System.out.println("You have $ " + currentfunds + " available.");
+      System.out.println("Goods in stock:");
       
-      if (currentfunds > 0 ) {
-        System.out.println("Buy sugar? (Enter Y or n):");
-        ans = sc.next();
-        if (ans.compareToIgnoreCase("Y")==0){
-          System.out.println("Enter amount to buy in tonns. (example 100):");
-          ans = sc.next();
-          double amount = Double.parseDouble(ans);
-          buyStock(amount, sugarprice);
-          sugarstock += amount;
-          printFunds();
+      for(int i = 0; i < goodArray.length; i++) {
+        if (goodArray[i] != null) {
+          System.out.println("You have: " + goodArray[i].stock + " of " + goodArray[i].name);
         }
-        System.out.println("Buy steel? (Enter Y):");
-        ans = sc.next();
-        if (ans.compareToIgnoreCase("Y")==0){
-          System.out.println("Enter amount to buy in tonns. (example 100):");
-          ans = sc.next();
-          double amount = Double.parseDouble(ans);
-          buyStock(amount, sugarprice);
-          steelstock += amount;
-          printFunds();
+      }
+      for(int i = 0; i < goodArray.length; i++) {
+        if (goodArray[i] != null) {
+          System.out.println(goodArray[i].name + " price in this round: " + goodArray[i].roundPrice());
         }
-        System.out.println("Sell sugar? (Enter Y):");
-        ans = sc.next();
-        if (ans.compareToIgnoreCase("Y")==0){
-          System.out.println("You have " + sugarstock + ". Enter amount to sell in tonns:");
-          ans = sc.next();
-          double amount = Double.parseDouble(ans);
-          if (checkStock(amount, sugarstock)){
-            sellStock(amount, sugarprice);
-            sugarstock -= amount;
-            printFunds();
-          } else {
-            System.out.println("You do not have enough sugar to sell.");
+      }
+      
+      
+      if (currentfunds > 0 ){
+        for(int i = 0; i < goodArray.length; i++){
+          if (goodArray[i] != null) {
+            System.out.println("Buy " + goodArray[i].name + " ? (Enter Y or n):");
+            s = StdIn.readString();
+            if (s.equals("Y")){
+              System.out.print("Enter amount to buy in tons. (example 100): ");
+              amount = StdIn.readInt();
+              buyStock(amount, goodArray[i].currentprice);
+              goodArray[i].stock += amount;
+              System.out.println("Funds: $ " + currentfunds);
+            }
           }
         }
-        System.out.println("Sell steel? (Enter Y):");
-        ans = sc.next();
-        if (ans.compareToIgnoreCase("Y")==0){
-          System.out.println("You have " + steelstock + ". Enter amount to sell in tonns:");
-          ans = sc.next();
-          double amount = Double.parseDouble(ans);
-          if (checkStock(amount, steelstock)){
-            sellStock(amount, steelprice);
-            steelstock -= amount;
-            printFunds();
-          } else {
-            System.out.println("You do not have enough steel to sell.");
+        for(int i = 0; i < goodArray.length; i++){
+        if (goodArray[i] != null){
+          System.out.println("Sell " + goodArray[i].name + " ? (Enter Y or n):");
+          s = StdIn.readString();
+          if (s.equals("Y")){
+            System.out.print("Enter amount to sell in tons. (example 100): ");
+            amount = StdIn.readInt();
+            sellStock(amount, goodArray[i].currentprice);
+            goodArray[i].stock -= amount;
+            System.out.println("Funds: $ " + currentfunds);
+            System.out.println("Stock: " + goodArray[i].stock);
           }
+        }
+      }
+        for(int i = 0; i < goodArray.length; i++){
+        if (goodArray[i] != null) {
+          roundendstock += goodArray[i].stock;
+        }
+      }
         
-        }
-      
-        totalstock = sugarstock + steelstock;
-        chargeStorage(totalstock);
-        currentround++;
-        System.out.println();
+      System.out.println("Round end stock :" + roundendstock);
+      totalstock = roundendstock;
+      chargeStorage(totalstock);
+      currentround++;
+      System.out.println("Total stock :" + totalstock);
+      System.out.println();
       } else {
         System.out.println("You balance is " + currentfunds + " you do not have enough money to continue playing.");
         canplay = false;
       }
-      
     }
   }
   
@@ -140,5 +142,14 @@ public class Game {
   
   private void printFunds(){
     System.out.println("You have $" + currentfunds + " available.");
+  }
+  
+  private void addGood(double funds){
+    if (funds >= 15000 && goodArray[2] == null){
+      goodArray[2] = new Good("Gold", 50.00, 120.00);
+      System.out.println("******** Congratulations you can now trade Gold ********");
+    } else {
+      System.out.println("Nothing to add!");
+    }
   }
 }
